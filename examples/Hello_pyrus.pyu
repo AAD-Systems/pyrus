@@ -1,0 +1,4 @@
+var saudacao = "Pyrus funcionando com sucesso!";
+var versao = "v0.0.0.0";
+print(saudacao);
+print(versao);
