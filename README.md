@@ -1,33 +1,64 @@
-# 🔥 Pyrus Programming Language (v0.0.0.0)
+# 🏺 Pyrus Programming Language (v0.1.0.0 Alpha)
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-0.0.0.0--alpha-red)
+[![Official Docs](https://img.shields.io/badge/docs-security--labor.github.io%2Fpyrus-8b5cf6)](https://security-labor.github.io/pyrus/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python: 3.8+](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
+[![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-red)](https://github.com/Security-Labor/Pyrus)
 
-**Pyrus** is an emerging systems programming language designed to combine the ergonomics of high-level scripting with the memory safety and performance of low-level languages.
+**Pyrus** is a systems-oriented programming language designed for engineers and automation experts. It bridges the gap between the rapid prototyping of Python and the strict, safe execution required for industrial and security applications.
+
+
 
 ---
 
-## 🚀 The Vision
-Pyrus was born from the need for a language that feels like Python but behaves like Go/Rust. 
-- **Extension:** `.pyu`
-- **Core Philosophy:** If it's not safe, it shouldn't compile.
+## 🚀 The Core Vision
+Pyrus was born within the **Security-Labor** ecosystem to provide a tool that is:
+- **Predictable:** Strict syntax with mandatory semicolons.
+- **Math-Heavy:** High-precision handling for engineering calculations (Flow, Pressure, Network Load).
+- **Concurrent:** Designed from the ground up for `spawn` operations and asynchronous tasks.
+- **Extensible:** Seamless integration with Python-based tools and future LLVM compilation.
 
-## ✨ Key Features (Roadmap)
-* **Memory Safety:** Ownership system without a Garbage Collector (GC).
-* **Concurrency:** Native `spawn` keyword for green-threads.
-* **Interoperability:** Easy C/Python FFI (Foreign Function Interface).
-* **Engine:** Built on top of LLVM for aggressive optimization.
+## ✨ Features (v0.1.0.0)
+- **Hybrid Type System:** Automatic detection of `String`, `Int`, and `Float`.
+- **Recursive Math Engine:** Support for complex expressions like `var x = (a + b) * (c / d);`.
+- **Developer CLI:** A robust command-line interface for running `.pyu` files.
+- **Comments Support:** Integrated `//` syntax for code documentation.
 
-## 🛠️ Installation (Preview)
+## 🛠️ Quick Start
 
-Currently in **Pre-Alpha (v0.0.0.0)**. To test the core interpreter:
+### 1. Installation
+Pyrus requires the **Lark** parsing engine. Install it via terminal (Termux, CMD, or Linux):
 
 ```bash
-# Clone the repository
-git clone [https://github.com/pyrus-lang/pyrus.git](https://github.com/pyrus-lang/pyrus.git)
-
-# Install dependencies
 pip install lark
 
-# Run a sample script
-python pyrus.py run examples/hello_world.pyu
+2. Your First Script (main.pyu)
+Create a file with the .pyu extension:
+// Pyrus Automation Example
+var target = "192.168.1.1";
+var base_freq = 60;
+var multiplier = 1.5;
+
+var final_freq = base_freq * multiplier;
+
+print("Target System:");
+print(target);
+print("Calibrated Frequency:");
+print(final_freq);
+
+3. Running the Code
+Navigate to the src folder and execute:
+python pyrus.py run ../examples/main.pyu
+
+🗺️ Roadmap to \pi
+ * [x] v0.0.0.0: Lexer/Parser Proof of Concept.
+ * [x] v0.1.0.0: Math Engine & Numeric Types.
+ * [ ] v0.2.0.0: Logic Flow (if/else) and Boolean Algebra.
+ * [ ] v0.3.0.0: Loops (while, for) and List structures.
+ * [ ] v0.5.0.0: Memory Ownership & Borrowing System.
+ * [ ] v1.0.0.0: Native LLVM Backend Integration.
+🛡️ Security & Labor
+Pyrus is an open-source project maintained by the Security-Labor Foundation. We believe in tools that empower the user through transparency and performance.
+ * Website: security-labor.github.io/pyrus
+ * Organization: github.com/Security-Labor
+Developed in Alagoas, Brazil. 🇧🇷
