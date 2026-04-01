@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pyrus | Official Language Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --accent: #8b5cf6; /* Pyrus Purple */
+            --accent-glow: rgba(139, 92, 246, 0.3);
+            --text-main: #e6edf3;
+            --text-dim: #8b949e;
+            --sidebar-width: 260px;
+            --border-color: #30363d;
+            --code-bg: #010409;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        nav.sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            color: var(--accent);
+        }
+
+        .nav-links { list-style: none; flex-grow: 1; }
+        .nav-links li { margin-bottom: 0.5rem; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dim);
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--border-color);
+            color: var(--accent);
+        }
+
+        /* --- MAIN CONTENT --- */
+        main {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 4rem;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .badge {
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        h1 { font-size: 4.5rem; line-height: 1.1; margin-bottom: 1.5rem; }
+        .gradient-text {
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p { font-size: 1.25rem; color: var(--text-dim); max-width: 600px; margin-bottom: 2.5rem; }
+
+        .cta-group { display: flex; gap: 1rem; }
+        .btn {
+            padding: 12px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 15px var(--accent-glow); }
+        .btn-outline { border: 1px solid var(--border-color); color: white; background: transparent; }
+        .btn:hover { transform: translateY(-3px); opacity: 0.9; }
+
+        /* --- CODE PREVIEW --- */
+        .code-container {
+            width: 100%;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-top: 4rem;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: var(--bg-card);
+            padding: 10px 20px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+
+        pre { padding: 25px; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; line-height: 1.6; }
+        .c-keyword { color: #ff7b72; }
+        .c-string { color: #a5d6ff; }
+        .c-var { color: #d2a8ff; }
+        .c-comment { color: #8b949e; }
+
+        /* --- DOCS / COMMANDS SECTION --- */
+        .section-title { font-size: 2.5rem; margin: 6rem 0 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+
+        .command-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .command-card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+
+        .command-card:hover { border-color: var(--accent); }
+        .command-card code { color: var(--accent); font-family: 'JetBrains Mono'; font-weight: bold; }
+        .command-card h3 { margin: 10px 0; }
+        .command-card p { color: var(--text-dim); font-size: 0.9rem; }
+
+        /* --- DOWNLOAD AREA --- */
+        .download-box {
+            background: linear-gradient(135deg, var(--bg-card), #1e293b);
+            padding: 4rem;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 900px) {
+            nav.sidebar { transform: translateX(-100%); width: 100%; }
+            main { margin-left: 0; width: 100%; padding: 2rem; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo-area">
+            <i class="fas fa-fire"></i> PYRUS
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home" class="active"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#docs"><i class="fas fa-book"></i> Documentação</a></li>
+            <li><a href="#commands"><i class="fas fa-terminal"></i> Comandos</a></li>
+            <li><a href="#video"><i class="fas fa-play-circle"></i> Tutoriais</a></li>
+            <li><a href="#download"><i class="fas fa-download"></i> Download</a></li>
+        </ul>
+        <div class="footer-sidebar" style="font-size: 0.7rem; color: var(--text-dim); text-align: center;">
+            v0.1.0.0 Alpha <br> Pyrus-Labor Systems © 2026
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="badge">NOVIDADE: v0.1.0.0 LANÇADA</div>
+            <h1>A Linguagem da <br> <span class="gradient-text">Automação Inteligente.</span></h1>
+            <p>Pyrus é construída para engenheiros que precisam da agilidade do Python com o rigor de sistemas de baixo nível. Segura, rápida e expansível.</p>
+            <div class="cta-group">
+                <a href="#download" class="btn btn-primary">Começar Agora</a>
+                <a href="https://github.com/Pyrus-Labor/pyrus" class="btn btn-outline"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <span style="font-size: 0.7rem; margin-left: 10px; color: var(--text-dim);">main.pyu</span>
+                </div>
+                <pre>
+<span class="c-comment">// Pyrus v0.1.0.0 - Cálculo de Engenharia</span>
+<span class="c-keyword">var</span> pressao = <span class="c-var">150.5</span>;
+<span class="c-keyword">var</span> ajuste = <span class="c-var">1.2</span>;
+<span class="c-keyword">var</span> resultado = pressao * ajuste;
+
+<span class="c-keyword">print</span>(<span class="c-string">"Iniciando Processo de Vazão..."</span>);
+<span class="c-keyword">print</span>(resultado);</pre>
+            </div>
+        </section>
+
+        <section id="commands">
+            <h2 class="section-title">Comandos & Sintaxe</h2>
+            <div class="command-list">
+                <div class="command-card">
+                    <code>var</code>
+                    <h3>Declaração</h3>
+                    <p>Cria uma variável no ambiente. Suporta Strings (entre "") e Números (inteiros e decimais).</p>
+                </div>
+                <div class="command-card">
+                    <code>print()</code>
+                    <h3>Saída de Dados</h3>
+                    <p>Exibe o valor de uma variável ou expressão diretamente no console do compilador.</p>
+                </div>
+                <div class="command-card">
+                    <code>+ - * /</code>
+                    <h3>Operadores</h3>
+                    <p>Matemática nativa de alta precisão. Agora com suporte a recursividade e ordem de precedência.</p>
+                </div>
+                <div class="command-card">
+                    <code>//</code>
+                    <h3>Comentários</h3>
+                    <p>Documente seu código de automação. Linhas ignoradas pelo parser do Pyrus.</p>
+                </div>
+                <div class="command-card">
+                    <code>spawn</code>
+                    <h3>Concorrência</h3>
+                    <p>(Beta) Despacha tarefas para execução em segundo plano. O coração do multithreading.</p>
+                </div>
+                <div class="command-card">
+                    <code>.pyu</code>
+                    <h3>Extensão</h3>
+                    <p>O formato oficial de arquivo reconhecido pelo CLI da Pyrus-Labor.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="video">
+            <h2 class="section-title">Vídeos & Demonstrações</h2>
+            <div style="aspect-ratio: 16/9; background: #000; border: 1px solid var(--border-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-dim);">
+                <div style="text-align: center;">
+                    <i class="fas fa-play" style="font-size: 3rem; margin-bottom: 1rem; color: var(--accent);"></i>
+                    <p>Vídeo: Como rodar a Pyrus no Termux (Mobile)</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="download">
+            <h2 class="section-title">Download Center</h2>
+            <div class="download-box">
+                <h2>Pronto para elevar sua engenharia a $\pi$?</h2>
+                <p style="margin: 1.5rem 0;">Baixe o pacote core v0.1.0.0 e comece a automatizar hoje mesmo.</p>
+                <div class="cta-group" style="justify-content: center;">
+                    <a href="#" class="btn btn-primary"><i class="fas fa-file-archive"></i> Download Source (.zip)</a>
+                    <a href="#" class="btn btn-outline"><i class="fab fa-python"></i> Python Runtime</a>
+                </div>
+                <p style="margin-top: 2rem; font-size: 0.8rem; color: var(--text-dim);">Hash: 7f8d9a21b3c4e5f6... (SHA-256)</p>
+            </div>
+        </section>
+
+        <footer style="margin-top: 8rem; padding-top: 2rem; border-top: 1px solid var(--border-color); color: var(--text-dim); display: flex; justify-content: space-between;">
+            <p>Pyrus-Labor Systems © 2026</p>
+            <div style="display: flex; gap: 20px;">
+                <a href="#" style="color: var(--text-dim);"><i class="fab fa-discord"></i></a>
+                <a href="#" style="color: var(--text-dim);"><i class="fab fa-twitter"></i></a>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // Smooth scroll e Active Link
+        const links = document.querySelectorAll('.nav-links a');
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                links.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Efeito de Typing no Hero (Inteligência Simples)
+        const text = "A Linguagem da Automação Inteligente.";
+        // Adicione lógica de digitação se quiser animar o H1
+    </script>
+</body>
+  </html>
+                                                                                                          
