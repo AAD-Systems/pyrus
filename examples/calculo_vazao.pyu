@@ -1,0 +1,12 @@
+// Teste de cálculo de automação Pyrus
+var ip_base = "192.168.1.";
+var porta = 8080;
+
+// Exemplo de cálculo de engenharia (Vazão ou Carga)
+var pressao = 150.5;
+var fator_correcao = 1.2;
+var resultado = pressao * fator_correcao;
+
+print(ip_base);
+print(resultado);
+print(porta + 1); // A Pyrus agora entende soma de números!
