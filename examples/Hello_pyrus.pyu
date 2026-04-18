@@ -1,4 +1,20 @@
-var saudacao = "Pyrus funcionando com sucesso!";
-var versao = "v0.0.0.0";
+// Pyrus v0.2.1 - Teste de Integração AEGIS
+var saudacao = "Pyrus Engine: Status Online";
+var versao = 0.2;
+var status_critico = 0.5;
+
 print(saudacao);
-print(versao);
+
+// Testando a nova lógica de comparação e blocos
+if (versao < status_critico) {
+    print("Aviso: Sistema em fase Alpha.");
+    
+    // Testando a nova precedência matemática
+    var calculo_teste = (10 + 5) * 2; 
+    print("Teste de Math Engine (15 * 2):");
+    print(calculo_teste);
+} else {
+    print("Sistema Estável.");
+}
+
+print("Desenvolvido por AEGIS Advanced Dynamics.");
