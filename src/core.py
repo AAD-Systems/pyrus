@@ -1,39 +1,37 @@
 import sys
-from lark import Lark, Transformer, v_args
+from lark import Lark, Tree
 
-# Gramática Pyrus v0.2 - Suporte a Blocos Lógicos, If/Else e Comparações
+# Gramática Pyrus v0.2.1 - Estabilidade de Blocos e Precedência
 pyrus_grammar = """
 ?start: program
 program: stmt*
 
-?stmt: var_decl | print_stmt | comment | if_stmt | block
+?stmt: var_decl | print_stmt | if_stmt | block | comment
 
-# Blocos de código permitem agrupar comandos dentro de { }
 block: "{" stmt* "}"
-
-# Definição do If/Else: O 'else' é opcional (?)
 if_stmt: "if" "(" condition ")" block ["else" block]
-
 var_decl: "var" CNAME "=" expr ";"
 print_stmt: "print" "(" expr ")" ";"
 comment: "//" /.*/
 
-# Condições lógicas para o IF
 ?condition: expr "==" expr -> eq
           | expr "!=" expr -> ne
           | expr ">" expr  -> gt
           | expr "<" expr  -> lt
 
-# Matemática e Expressões (Mantendo v0.1)
+# Precedência: expr (soma) -> term (mult) -> factor (base)
 ?expr: term
      | expr "+" term   -> add
      | expr "-" term   -> sub
-     | expr "*" term   -> mul
-     | expr "/" term   -> div
 
-?term: NUMBER          -> number
-     | ESCAPED_STRING  -> string
-     | CNAME           -> var_ref
+?term: factor
+     | term "*" factor -> mul
+     | term "/" factor -> div
+
+?factor: NUMBER        -> number
+       | ESCAPED_STRING -> string
+       | CNAME          -> var_ref
+       | "(" expr ")"
 
 %import common.CNAME
 %import common.NUMBER
@@ -42,70 +40,98 @@ comment: "//" /.*/
 %ignore WS
 """
 
-class PyrusEvaluator(Transformer):
+class PyrusInterpreter:
     def __init__(self):
-        self.env = {} # Dicionário que serve como memória (RAM) da linguagem
+        self.env = {}
 
-    # --- GERENCIAMENTO DE VARIÁVEIS ---
-    def var_decl(self, args):
-        name, value = args
-        self.env[str(name)] = value
-        return value
+    def run(self, tree):
+        if isinstance(tree, Tree):
+            method = getattr(self, tree.data, self.generic_visit)
+            return method(tree)
+        return tree
 
-    def var_ref(self, name):
-        name = str(name[0])
+    def generic_visit(self, tree):
+        for child in tree.children:
+            self.run(child)
+
+    def program(self, tree):
+        for child in tree.children:
+            self.run(child)
+
+    def var_decl(self, tree):
+        name = str(tree.children[0])
+        value = self.run(tree.children[1])
+        self.env[name] = value
+
+    def var_ref(self, tree):
+        name = str(tree.children[0])
         if name in self.env:
             return self.env[name]
         raise NameError(f"Erro: Variável '{name}' não definida.")
 
-    # --- SAÍDA ---
-    def print_stmt(self, args):
-        value = args[0]
+    def print_stmt(self, tree):
+        value = self.run(tree.children[0])
         print(f"[Pyrus Out] -> {value}")
 
-    # --- LÓGICA DE DECISÃO (O coração da v0.2) ---
-    def if_stmt(self, args):
-        condition, if_block = args[0], args[1]
-        else_block = args[2] if len(args) > 2 else None
+    def if_stmt(self, tree):
+        cond_tree = tree.children[0]
+        if_block = tree.children[1]
+        else_block = tree.children[2] if len(tree.children) > 2 else None
 
-        # Se a condição for verdadeira, executa o primeiro bloco
-        if condition:
-            return if_block
-        # Se houver um 'else' e a condição for falsa, executa o segundo
+        if self.run(cond_tree):
+            self.run(if_block)
         elif else_block:
-            return else_block
+            self.run(else_block)
 
-    # Transforma o conteúdo do bloco em uma lista de comandos executáveis
-    def block(self, args):
-        return args
+    def block(self, tree):
+        for stmt in tree.children:
+            self.run(stmt)
 
-    # --- COMPARADORES ---
-    def eq(self, args): return args[0] == args[1]
-    def ne(self, args): return args[0] != args[1]
-    def gt(self, args): return args[0] > args[1]
-    def lt(self, args): return args[0] < args[1]
+    # Comparadores
+    def eq(self, tree): return self.run(tree.children[0]) == self.run(tree.children[1])
+    def ne(self, tree): return self.run(tree.children[0]) != self.run(tree.children[1])
+    def gt(self, tree): return self.run(tree.children[0]) > self.run(tree.children[1])
+    def lt(self, tree): return self.run(tree.children[0]) < self.run(tree.children[1])
 
-    # --- TIPOS DE DADOS ---
-    def number(self, n):
-        return float(n[0]) if '.' in n[0] else int(n[0])
+    # Matemática
+    def add(self, tree): return self.run(tree.children[0]) + self.run(tree.children[1])
+    def sub(self, tree): return self.run(tree.children[0]) - self.run(tree.children[1])
+    def mul(self, tree): return self.run(tree.children[0]) * self.run(tree.children[1])
+    def div(self, tree): return self.run(tree.children[0]) / self.run(tree.children[1])
 
-    def string(self, s):
-        return str(s[0])[1:-1]
+    # Tipos
+    def number(self, tree):
+        val = tree.children[0]
+        return float(val) if '.' in val else int(val)
 
-    # --- OPERAÇÕES MATEMÁTICAS ---
-    def add(self, args): return args[0] + args[1]
-    def sub(self, args): return args[0] - args[1]
-    def mul(self, args): return args[0] * args[1]
-    def div(self, args): return args[0] / args[1]
-    
-    def comment(self, args): pass
+    def string(self, tree):
+        return str(tree.children[0])[1:-1]
 
-# Usamos o parser LALR para garantir velocidade e evitar ambiguidades
-parser = Lark(pyrus_grammar, start='program', parser='lalr', transformer=PyrusEvaluator())
+    def comment(self, tree): pass
 
-def executar_codigo(codigo_fonte):
+# Setup do Parser
+pyrus_parser = Lark(pyrus_grammar, start='program', parser='lalr')
+
+def executar(codigo):
     try:
-        # Na v0.2, o transformer já está integrado no parser para execução imediata
-        parser.parse(codigo_fonte)
+        ast = pyrus_parser.parse(codigo)
+        interpreter = PyrusInterpreter()
+        interpreter.run(ast)
     except Exception as e:
-        print(f"❌ Erro Pyrus v0.2:\n{e}")
+        print(f"❌ Erro Pyrus:\n{e}")
+
+# --- TESTE DA LÓGICA ---
+meu_codigo = """
+var x = 10;
+var limite = 5;
+
+if (x > limite) {
+    print("X e maior que o limite!");
+    var calculo = (x + 2) * 10;
+    print(calculo);
+} else {
+    print("X e menor.");
+}
+"""
+
+executar(meu_codigo)
