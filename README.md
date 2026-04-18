@@ -3,7 +3,7 @@
 [![Official
 
 <p align="center">
-  <img src="./assets/banner.png" alt="Pyrus Banner" width="100%">
+  <img src="banner.png" alt="Pyrus Banner" width="100%">
 </p>
 
 <p align="center">
