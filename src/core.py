@@ -1,25 +1,35 @@
 import sys
 from lark import Lark, Tree
 
-# Gramática Pyrus v0.2.1 - Estabilidade de Blocos e Precedência
+# Gramática Pyrus v0.1.2 - Híbrida (Python + Lua)
+# Removemos a obrigatoriedade de ';' e '{ }'
 pyrus_grammar = """
 ?start: program
 program: stmt*
 
-?stmt: var_decl | print_stmt | if_stmt | block | comment
+?stmt: assign | print_stmt | if_stmt | comment
 
-block: "{" stmt* "}"
-if_stmt: "if" "(" condition ")" block ["else" block]
-var_decl: "var" CNAME "=" expr ";"
-print_stmt: "print" "(" expr ")" ";"
-comment: "//" /.*/
+// Blocos Híbridos: Aceita Lua (then..end), C ({..}) ou Python-like (:..end)
+block: "{" stmt* "}" 
+     | "then" stmt* "end" 
+     | ":" stmt* "end"
+
+if_stmt: "if" condition block ["else" block]
+
+// Variáveis podem ser declaradas com 'var', 'local' ou diretamente 'x = 10'
+assign: ["var" | "local"] CNAME "=" expr [";"]
+
+print_stmt: "print" "(" expr ")" [";"]
+
+// Comentários: Python (#), Lua (--) ou C (//)
+comment: "#" /.*/ | "--" /.*/ | "//" /.*/
 
 ?condition: expr "==" expr -> eq
           | expr "!=" expr -> ne
-          | expr ">" expr  -> gt
-          | expr "<" expr  -> lt
+          | expr ">"  expr -> gt
+          | expr "<"  expr -> lt
+          | "(" condition ")"
 
-# Precedência: expr (soma) -> term (mult) -> factor (base)
 ?expr: term
      | expr "+" term   -> add
      | expr "-" term   -> sub
@@ -28,7 +38,7 @@ comment: "//" /.*/
      | term "*" factor -> mul
      | term "/" factor -> div
 
-?factor: NUMBER        -> number
+?factor: NUMBER         -> number
        | ESCAPED_STRING -> string
        | CNAME          -> var_ref
        | "(" expr ")"
@@ -58,9 +68,13 @@ class PyrusInterpreter:
         for child in tree.children:
             self.run(child)
 
-    def var_decl(self, tree):
-        name = str(tree.children[0])
-        value = self.run(tree.children[1])
+    def assign(self, tree):
+        # Lida com declarações opcionais de 'var' ou 'local'
+        name_node = tree.children[0] if len(tree.children) == 2 else tree.children[1]
+        val_node = tree.children[1] if len(tree.children) == 2 else tree.children[2]
+        
+        name = str(name_node)
+        value = self.run(val_node)
         self.env[name] = value
 
     def var_ref(self, tree):
@@ -71,7 +85,7 @@ class PyrusInterpreter:
 
     def print_stmt(self, tree):
         value = self.run(tree.children[0])
-        print(f"[Pyrus Out] -> {value}")
+        print(f"[Pyrus] {value}")
 
     def if_stmt(self, tree):
         cond_tree = tree.children[0]
@@ -87,19 +101,16 @@ class PyrusInterpreter:
         for stmt in tree.children:
             self.run(stmt)
 
-    # Comparadores
+    # Matemática e Lógica
     def eq(self, tree): return self.run(tree.children[0]) == self.run(tree.children[1])
     def ne(self, tree): return self.run(tree.children[0]) != self.run(tree.children[1])
     def gt(self, tree): return self.run(tree.children[0]) > self.run(tree.children[1])
     def lt(self, tree): return self.run(tree.children[0]) < self.run(tree.children[1])
-
-    # Matemática
     def add(self, tree): return self.run(tree.children[0]) + self.run(tree.children[1])
     def sub(self, tree): return self.run(tree.children[0]) - self.run(tree.children[1])
     def mul(self, tree): return self.run(tree.children[0]) * self.run(tree.children[1])
     def div(self, tree): return self.run(tree.children[0]) / self.run(tree.children[1])
 
-    # Tipos
     def number(self, tree):
         val = tree.children[0]
         return float(val) if '.' in val else int(val)
@@ -109,7 +120,6 @@ class PyrusInterpreter:
 
     def comment(self, tree): pass
 
-# Setup do Parser
 pyrus_parser = Lark(pyrus_grammar, start='program', parser='lalr')
 
 def executar(codigo):
@@ -118,20 +128,5 @@ def executar(codigo):
         interpreter = PyrusInterpreter()
         interpreter.run(ast)
     except Exception as e:
-        print(f"❌ Erro Pyrus:\n{e}")
-
-# --- TESTE DA LÓGICA ---
-meu_codigo = """
-var x = 10;
-var limite = 5;
-
-if (x > limite) {
-    print("X e maior que o limite!");
-    var calculo = (x + 2) * 10;
-    print(calculo);
-} else {
-    print("X e menor.");
-}
-"""
-
-executar(meu_codigo)
+        print(f"❌ Erro de Sintaxe/Execução:\n{e}")
+              
